@@ -52,7 +52,7 @@ local function ToggleLoopESP()
                             local ESP = Instance.new('Highlight', v)
                             ESP.Name = 'ESP'
                             ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                            ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
+                            ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name):IsA('MeshPart') and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
                             Items[v.Name] = ESP
                         end
                     end
@@ -79,10 +79,23 @@ local function UpdateItemsTable()
     end
 end
 local function RemoveESPItemsFromItems()
-    for i, v in ipairs(Items) do
-        if i and v then
-            Items[i] = nil
-            v:Destroy()
+    while (enabled == false) and wait(0.5) do
+        local Map = GetCurrentMapAsync()
+        if Map[1] then
+            -- Get the 'Utilities' child from Map[1]
+            local utilities = Map[1]:WaitForChild('Utilities', 60)
+
+            if utilities then
+                for i, v in ipairs(utilities:GetChildren()) do
+                    if v and v.ClassName == 'Model' then
+                        local HasESP = v:FindFirstChild('ESP')
+
+                        if HasESP then
+                            v:FindFirstChild('ESP'):Destroy()
+                        end
+                    end
+                end
+            end
         end
     end
 end
@@ -101,4 +114,4 @@ end)
 
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
