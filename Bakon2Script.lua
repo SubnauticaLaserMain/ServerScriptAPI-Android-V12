@@ -20,6 +20,14 @@ local ItemESPToggle = Tabs['ESP-Tab']:AddToggle('ItemESP-ToggleRenv', {
     Title = 'Item ESP',
     Default = false
 })
+
+local TrapESPToggle = Tabs['ESP-Tab']:AddToggle('TrapESP-ToggleRenv', {
+    Title = 'Trap ESP',
+    Default = false
+})
+
+
+
 local function GetCurrentMapAsync()
     local MapsFolder = workspace:WaitForChild('CurrentMap', 70)
     if not MapsFolder then
@@ -79,13 +87,81 @@ local function UpdateItemsTable()
     end
 end
 local function RemoveESPItemsFromItems()
-    for i, v in ipairs(Items) do
-        if i and v then
-            Items[i] = nil
-            v:Destroy()
+    while (enabled == false) and wait(0.5) do
+        local Map = GetCurrentMapAsync()
+        if Map[1] then
+            -- Get the 'Utilities' child from Map[1]
+            local utilities = Map[1]:WaitForChild('Utilities', 60)
+
+            if utilities then
+                for i, v in ipairs(utilities:GetChildren()) do
+                    if v and v.ClassName == 'Model' then
+                        local HasESP = v:FindFirstChild('ESP')
+
+                        if HasESP then
+                            v:FindFirstChild('ESP'):Destroy()
+                        end
+                    end
+                end
+            end
         end
     end
 end
+
+local TrapESPEnabled = false
+local function DoTrapESPLoopForTrapESP()
+    while (TrapESPEnabled == true) and wait(0.5) do
+        local Map = GetCurrentMapAsync()
+
+        if Map[1] then
+            local TrapsFolder = Map:WaitForChild('TemporaryTraps', 60)
+
+            if TrapsFolder then
+                for i, v in ipairs(TrapsFolder:GetChildren()) do
+                    if v and v.ClassName == 'Model' then
+                        local HasESP = v:FindFirstChild('ESP')
+
+
+                        if not HasESP then
+                            local ESP = Instance.new('Highlight', v)
+                            ESP.Name = 'ESP'
+                            ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                            ESP.FillColor = Color3.new(1, 1, 1)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+local function DoTrapESPLoopForRemoveTrapESP()
+    while (TrapESPEnabled == false) and wait(0.5) do
+        local Map = GetCurrentMapAsync()
+
+        if Map[1] then
+            local TrapsFolder = Map[1]:WaitForChild('TemporaryTraps', 60)
+
+            if TrapsFolder then
+                for i, v in ipairs(TrapsFolder:GetChildren()) do
+                    if v and v.ClassName == 'Model' then
+                        local HasESP = v:FindFirstChild('ESP')
+
+
+                        if HasESP then
+                            v:WaitForChild('ESP'):Destroy()
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+
+
+
+
 ItemESPToggle:OnChanged(function(toggle)
     enabled = toggle
     if toggle == true then
@@ -93,10 +169,22 @@ ItemESPToggle:OnChanged(function(toggle)
         ToggleLoopESP()
     else
         UpdateItemsTable()
-        print('REMOVING ALL ESP FROM ALL ITEMS')
         RemoveESPItemsFromItems()
     end
 end)
+
+
+TrapESPToggle:OnChanged(function(toggle)
+    TrapESPEnabled = toggle
+
+
+    if toggle == true then
+        DoTrapESPLoopForTrapESP()
+    else
+        DoTrapESPLoopForRemoveTrapESP()
+    end
+end)
+
 
 
 
