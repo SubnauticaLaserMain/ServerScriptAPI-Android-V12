@@ -39,16 +39,21 @@ local function ToggleLoopESP()
     while (enabled == true) and wait(0.5) do
         local Map = GetCurrentMapAsync()
         if Map[1] then
-            for i, v in Map[1]:WaitForChild('Utilities', 60) do
-                if v and v.ClassName == 'Model' then
-                    local HasESP = v:FindFirstChild('ESP')
+            -- Get the 'Utilities' child from Map[1]
+            local utilities = Map[1]:WaitForChild('Utilities', 60)
 
-                    if not HasESP then
-                        local ESP = Instance.new('Highlight', v)
-                        ESP.Name = 'ESP'
-                        ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
-                        
+            if utilities then
+                for i, v in ipairs(utilities:GetChildren()) do
+                    if v and v.ClassName == 'Model' then
+                        local HasESP = v:FindFirstChild('ESP')
+
+                        if not HasESP then
+                            local ESP = Instance.new('Highlight', v)
+                            ESP.Name = 'ESP'
+                            ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                            ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
+                            
+                        end
                     end
                 end
             end
@@ -64,4 +69,4 @@ end)
 
 
 
-loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon.lua', true))()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
