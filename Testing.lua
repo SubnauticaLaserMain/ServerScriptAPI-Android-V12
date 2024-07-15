@@ -447,6 +447,16 @@ end)
 
 
 
+local function GetTabsTableInString()
+    local String = ''
 
+    for i, v in Tabs do
+        String = tostring(i) .. ', '
+    end
+
+    return String
+end
+
+print('Finished loading, with tabs table beeing: ' .. GetTabsTableInString())
 
 -- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Testing.lua', true))()
