@@ -26,6 +26,22 @@ local TrapESPToggle = Tabs['ESP-Tab']:AddToggle('TrapESP-ToggleRenv', {
     Default = false
 })
 
+local PlayerESPToggle = Tabs['ESP-Tab']:AddToggle('PLR-ESP-ToggleRenv', {
+    Title = 'Player ESP',
+    Default = false
+})
+
+local BeaconESPToggle = Tabs['ESP-Tab']:AddToggle('BeaconESP-ToggleRenv', {
+    Title = 'Beacon ESP',
+    Default = false
+})
+
+
+local Players = game:GetService('Players')
+
+
+
+
 
 
 local function GetCurrentMapAsync()
@@ -156,6 +172,58 @@ local function DoTrapESPLoopForRemoveTrapESP()
         end
     end
 end
+local function InvokeBeaconBot()
+    local Map = GetCurrentMapAsync()
+
+
+    if Map[1] then
+        for i, v in Map[1]:GetChildren() do
+            if string.find(v.Name, 'BakonBot') then
+                local BeaconBot = v
+                return BeaconBot
+            end
+        end
+    else
+        return
+    end
+end
+local function InvokeBeacon()
+    for i, v in ipairs(Players:GetPlayers()) do
+        local isBeacon = v.Character:FindFirstChild('AnimSaves')
+
+        if isBeacon and isBeacon:IsA('Model') then
+            return v.Character
+        end
+    end
+end
+local function InvokeSurvivals()
+    local Survivers = {}
+
+
+    for i, v in ipairs(Players:GetPlayers()) do
+        local Character = v.Character or v.CharacterAdded:Wait()
+
+        if Character then
+            if not Character:FindFirstChild('AnimSaves') then
+                Survivers[i] = v
+            end
+        end
+    end
+
+    return Survivers
+end
+local function isBeacon()
+    local BeaconBot = InvokeBeaconBot()
+    local Beacon = InvokeBeacon()
+
+
+    if BeaconBot or Beacon then
+        return true
+    end
+
+    return false
+end
+
 
 
 
@@ -187,6 +255,63 @@ end)
 
 
 
+local BeacoNESPEnbled = false
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon.lua', true))()
+
+local function AddESP_Beacon()
+    while (BeacoNESPEnbled == true) and wait(0.5) do
+        local IsBeaconHere = isBeacon()
+
+        if IsBeaconHere then
+            local BeaconBot = InvokeBeaconBot()
+            local Beacon = InvokeBeacon()
+
+            if BeaconBot not BeaconBot:FindFirstChild('ESP') then
+                local ESP = Instance.new('Highlight', BeaconBot)
+                ESP.Name = 'ESP'
+                ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                ESP.FillColor = Color3.new(1, 1, 1)
+            elseif Beacon and not Beacon:FindFirstChild('ESP') then        
+                local ESP = Instance.new('Highlight', Beacon)
+                ESP.Name = 'ESP'
+                ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                ESP.FillColor = Color3.new(1, 1, 1)
+            end
+        end
+    end
+end
+local function RemoveESP_Beacon()
+    while (BeacoNESPEnbled == false) and wait(0.5) do
+        local IsBeaconHere = isBeacon()
+
+        if IsBeaconHere then
+            local BeaconBot = InvokeBeaconBot()
+            local Beacon = InvokeBeacon()
+
+            if BeaconBot and BeaconBot:FindFirstChild('ESP') then
+                BeaconBot:WaitForChild('ESP'):Destroy()
+            elseif Beacon and Beacon:FindFirstChild('ESP') then
+                Beacon:WaitForChild('ESP'):Destroy()
+            end
+        end
+    end
+end
+
+
+
+BeaconESPToggle:OnChanged(function(toggle)
+    BeacoNESPEnbled = toggle
+
+    if toggle == true then
+        AddESP_Beacon()
+    else
+        RemoveESP_Beacon()
+    end
+end)
+
+
+
+
+
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
