@@ -76,13 +76,17 @@ local function RemoveESPItemsFromItems()
     end
 
     if Map and Map[1] then
+        print('MAP FOUND!')
         -- Get the 'Utilities' child from Map[1]
         local utilities = Map[1]:WaitForChild('Utilities', 60)
 
         if utilities then
             for i, v in ipairs(utilities:GetChildren()) do
                 if v and v.ClassName == 'Model' and v:FindFirstChild('ESP') then
+                    print('Successfully removed esp from: ' .. tostring(v:GetFullName()))
                     v:WaitForChild('ESP'):Destroy()
+                else
+                    warn('Skipped: ' .. tostring(v:GetFullName()))
                 end
             end
         end
@@ -93,6 +97,7 @@ ItemESPToggle:OnChanged(function(toggle)
     if toggle == true then
         ToggleLoopESP()
     else
+        print('REMOVING ALL ESP FROM ALL ITEMS')
         RemoveESPItemsFromItems()
     end
 end)
