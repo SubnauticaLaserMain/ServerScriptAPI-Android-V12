@@ -11,6 +11,11 @@ local Windows = Library:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 local Tabs = {
+    ['Player'] = Windows:AddTab({
+        Title = 'Player',
+        Icon = 'user-round-pen'
+    }),
+
     ['ESP-Tab'] = Windows:AddTab({
         Title = 'ESP',
         Icon = 'expand'
@@ -369,6 +374,77 @@ PlayerESPToggle:OnChanged(function(toggle)
         RemovePlayerESP_Object()
     end
 end)
+
+
+
+local function GetHumanoid()
+    local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+
+    if Character then
+        local Humanoid = Character:WaitForChild('Humanoid', 120)
+
+        if Humanoid then
+            return Humanoid
+        else
+            warn('Waited 120 SEC (2 MINS) FOR HUMANOID, AND FAILED.')
+            return
+        end
+    end
+end
+
+
+
+local WalkSpeedToggle = Tabs['Player']:AddToggle('ToggleWalkerSpeeder-Renver', {
+    Title = 'Toggle Walkspeed',
+    Default = false
+})
+
+
+local WalkSpeedSlider = Tabs['Player']:AddSlider('ToggleWalkSpeederSliderAsyncer-Renver', {
+    Title = 'WalkSpeed Value',
+    Description = 'Choose how fast you walk.',
+    Default = GetHumanoid().WalkSpeed,
+    Min = 0,
+    Max = 100,
+    Rounding = 1,
+    Callback = function(a)end
+})
+
+local NewWalkSpeedValue = GetHumanoid().WalkSpeed
+local NewWalkSpeedValueEnabled = false
+
+
+local WalkSpeedSliderValue = 16
+WalkSpeedSlider:OnChanged(function(Val)
+    WalkSpeedSliderValue = Val
+end)
+
+
+local function UpdateWalkSpeedObjectItemsTableForLocalPlayer()
+    while (NewWalkSpeedValueEnabled == true) and wait(0.2) do
+        if GetHumanoid().WalkSpeed ~= WalkSpeedSliderValue then
+            GetHumanoid().WalkSpeed = WalkSpeedSliderValue
+        end
+    end
+end
+
+local function ResetWalkSpeedBackToWhatItWas()
+    if GetHumanoid() and GetHumanoid().WalkSpeed then
+        GetHumanoid().WalkSpeed = NewWalkSpeedValue
+    end
+end
+
+
+WalkSpeedToggle:OnChanged(function(toggle)
+    NewWalkSpeedValueEnabled = toggle
+
+    if toggle == true then
+        UpdateWalkSpeedObjectItemsTableForLocalPlayer()
+    else
+        ResetWalkSpeedBackToWhatItWas()
+    end
+end)
+
 
 
 
