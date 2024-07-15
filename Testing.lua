@@ -196,7 +196,7 @@ local function InvokeBeacon()
         end
     end
 end
-local function InvokeSurvivals()
+local function InvokeSurvivers()
     local Survivers = {}
 
 
@@ -311,9 +311,66 @@ BeaconESPToggle:OnChanged(function(toggle)
 end)
 
 
-local Script = game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua')
-
-loadstring(Script)()
+local wait = task.wait
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
+local PlayerESPEnabled = false
+local function AddPlayerESP_Object()
+    while (PlayerESPEnabled == true) and wait(0.5) do
+        local Survivers = InvokeSurvivers()
+        
+        for i, v in ipairs(Survivers) do
+            if i and v and v:IsA('Player') then
+                local Character = v.Character or v.CharacterAdded:Wait()
+
+                if Character then
+                    local HasESP = Character:FindFirstChild('ESP')
+
+                    if not HasESP then
+                        local ESP = Instance.new('Highlight', Character)
+                        ESP.Name = 'ESP'
+                        ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        ESP.FillColor = Color3.new(1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+local function RemovePlayerESP_Object()
+    while (PlayerESPEnabled == false) and wait(0.5) do
+        local Survivers = InvokeSurvivers()
+        
+        for i, v in ipairs(Survivers) do
+            if i and v and v:IsA('Player') then
+                local Character = v.Character or v.CharacterAdded:Wait()
+
+                if Character then
+                    local HasESP = Character:FindFirstChild('ESP')
+
+                    if HasESP then
+                        Character:WaitForChild('ESP'):Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+PlayerESPToggle:OnChanged(function(toggle)
+    PlayerESPEnabled = toggle
+
+    if toggle == true then
+        AddPlayerESP_Object()
+    else
+        RemovePlayerESP_Object()
+    end
+end)
+
+
+
+
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Testing.lua', true))()
