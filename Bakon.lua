@@ -52,9 +52,37 @@ local function ToggleLoopESP()
                             ESP.Name = 'ESP'
                             ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
                             ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
-                            
                         end
                     end
+                end
+            end
+        end
+    end
+end
+local function RemoveESPItemsFromItems()
+    local WaitForMap = true
+    local Map = nil
+    while (WaitForMap == true) and wait(1) do
+        Map = GetCurrentMapAsync()
+
+        if enabled == false then
+            return
+        end
+
+        if Map then
+            WaitForMap = false
+            break
+        end
+    end
+
+    if Map and Map[1] then
+        -- Get the 'Utilities' child from Map[1]
+        local utilities = Map[1]:WaitForChild('Utilities', 60)
+
+        if utilities then
+            for i, v in ipairs(utilities:GetChildren()) do
+                if v and v.ClassName == 'Model' and v:FindFirstChild('ESP') then
+                    v:WaitForChild('ESP'):Destroy()
                 end
             end
         end
@@ -64,6 +92,8 @@ ItemESPToggle:OnChanged(function(toggle)
     enabled = toggle
     if toggle == true then
         ToggleLoopESP()
+    else
+        RemoveESPItemsFromItems()
     end
 end)
 
