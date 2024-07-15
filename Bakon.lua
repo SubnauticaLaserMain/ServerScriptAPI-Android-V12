@@ -64,6 +64,7 @@ local function RemoveESPItemsFromItems()
     local Map = nil
     while (WaitForMap == true) and wait(1) do
         Map = GetCurrentMapAsync()
+        print('Finding map. Map is currently: ' .. tostring(Map) .. ': [1] is: ' .. tostring(Map[1]))
 
         if enabled == false then
             return
@@ -71,9 +72,11 @@ local function RemoveESPItemsFromItems()
 
         if Map then
             WaitForMap = false
-            break
         end
     end
+
+    print('FOUND MAP TABLE WITH. Map is currently: ' .. tostring(Map) .. ': [1] is: ' .. tostring(Map[1]))
+    
 
     if Map and Map[1] then
         print('MAP FOUND!')
@@ -104,4 +107,4 @@ end)
 
 
 
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Testing.lua', true))()
