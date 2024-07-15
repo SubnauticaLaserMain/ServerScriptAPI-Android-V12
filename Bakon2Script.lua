@@ -34,6 +34,7 @@ local function GetCurrentMapAsync()
         return
     end 
 end
+local Items = {}
 local enabled = false
 local function ToggleLoopESP()
     while (enabled == true) and wait(0.5) do
@@ -51,7 +52,8 @@ local function ToggleLoopESP()
                             local ESP = Instance.new('Highlight', v)
                             ESP.Name = 'ESP'
                             ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                            ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
+                            ESP.FillColor = (v:FindFirstChild(v.Name) and v:FindFirstChild(v.Name):IsA('MeshPart') and v:FindFirstChild(v.Name).Color) or Color3.new(1, 1, 1)
+                            Items[v.Name] = ESP
                         end
                     end
                 end
@@ -59,49 +61,43 @@ local function ToggleLoopESP()
         end
     end
 end
-local function RemoveESPItemsFromItems()
-    local WaitForMap = true
-    local Map = nil
-    while (WaitForMap == true) and wait(1) do
-        Map = GetCurrentMapAsync()
-        print('Finding map. Map is currently: ' .. tostring(Map))
-
-        if enabled == false then
-            return
-        end
-
-        if Map then
-            WaitForMap = false
-            break
-        end
-    end
-
-    if Map and Map[1] then
-        print('MAP FOUND!')
+local function UpdateItemsTable()
+    local Map = GetCurrentMapAsync()
+    if Map[1] then
         -- Get the 'Utilities' child from Map[1]
         local utilities = Map[1]:WaitForChild('Utilities', 60)
 
         if utilities then
             for i, v in ipairs(utilities:GetChildren()) do
-                if v and v.ClassName == 'Model' and v:FindFirstChild('ESP') then
-                    print('Successfully removed esp from: ' .. tostring(v:GetFullName()))
-                    v:WaitForChild('ESP'):Destroy()
-                else
-                    warn('Skipped: ' .. tostring(v:GetFullName()))
+                if v and v.ClassName == 'Model' then
+                    local HasESP = v:FindFirstChild('ESP')
+
+                    Items[v.Name] = v:FindFirstChild('ESP')
                 end
             end
+        end
+    end
+end
+local function RemoveESPItemsFromItems()
+    for i, v in ipairs(Items) do
+        if i and v then
+            Items[i] = nil
+            v:Destroy()
         end
     end
 end
 ItemESPToggle:OnChanged(function(toggle)
     enabled = toggle
     if toggle == true then
+        UpdateItemsTable()
         ToggleLoopESP()
     else
+        UpdateItemsTable()
         print('REMOVING ALL ESP FROM ALL ITEMS')
         RemoveESPItemsFromItems()
     end
 end)
+
 
 
 
