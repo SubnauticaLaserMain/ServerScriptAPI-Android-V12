@@ -21,6 +21,35 @@ local Tabs = {
         Icon = 'expand'
     })
 }
+local WalkSpeedToggle = Tabs['Player']:AddToggle('ToggleWalkerSpeeder-Renver', {
+    Title = 'Toggle Walkspeed',
+    Default = false
+})
+
+local function GetHumanoid()
+    local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+
+    if Character then
+        local Humanoid = Character:WaitForChild('Humanoid', 120)
+
+        if Humanoid then
+            return Humanoid
+        else
+            warn('Waited 120 SEC (2 MINS) FOR HUMANOID, AND FAILED.')
+            return
+        end
+    end
+end
+
+local WalkSpeedSlider = Tabs['Player']:AddSlider('ToggleWalkSpeederSliderAsyncer-Renver', {
+    Title = 'WalkSpeed Value',
+    Description = 'Choose how fast you walk.',
+    Default = GetHumanoid().WalkSpeed,
+    Min = 0,
+    Max = 100,
+    Rounding = 1,
+    Callback = function(a)end
+})
 local ItemESPToggle = Tabs['ESP-Tab']:AddToggle('ItemESP-ToggleRenv', {
     Title = 'Item ESP',
     Default = false
@@ -46,6 +75,25 @@ local Players = game:GetService('Players')
 
 
 
+
+
+
+local function InvokeSurvivers()
+    local Survivers = {}
+
+
+    for i, v in ipairs(Players:GetPlayers()) do
+        local Character = v.Character or v.CharacterAdded:Wait()
+
+        if Character then
+            if not Character:FindFirstChild('AnimSaves') then
+                Survivers[i] = v
+            end
+        end
+    end
+
+    return Survivers
+end
 
 
 
@@ -113,38 +161,6 @@ end)
 
 
 
-local function GetHumanoid()
-    local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
-
-    if Character then
-        local Humanoid = Character:WaitForChild('Humanoid', 120)
-
-        if Humanoid then
-            return Humanoid
-        else
-            warn('Waited 120 SEC (2 MINS) FOR HUMANOID, AND FAILED.')
-            return
-        end
-    end
-end
-
-
-
-local WalkSpeedToggle = Tabs['Player']:AddToggle('ToggleWalkerSpeeder-Renver', {
-    Title = 'Toggle Walkspeed',
-    Default = false
-})
-
-
-local WalkSpeedSlider = Tabs['Player']:AddSlider('ToggleWalkSpeederSliderAsyncer-Renver', {
-    Title = 'WalkSpeed Value',
-    Description = 'Choose how fast you walk.',
-    Default = GetHumanoid().WalkSpeed,
-    Min = 0,
-    Max = 100,
-    Rounding = 1,
-    Callback = function(a)end
-})
 
 local NewWalkSpeedValue = GetHumanoid().WalkSpeed
 local NewWalkSpeedValueEnabled = false
@@ -360,22 +376,6 @@ local function InvokeBeacon()
             return v.Character
         end
     end
-end
-local function InvokeSurvivers()
-    local Survivers = {}
-
-
-    for i, v in ipairs(Players:GetPlayers()) do
-        local Character = v.Character or v.CharacterAdded:Wait()
-
-        if Character then
-            if not Character:FindFirstChild('AnimSaves') then
-                Survivers[i] = v
-            end
-        end
-    end
-
-    return Survivers
 end
 local function isBeacon()
     local BeaconBot = InvokeBeaconBot()
