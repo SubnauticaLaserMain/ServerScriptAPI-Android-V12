@@ -267,7 +267,7 @@ local function AddESP_Beacon()
             local BeaconBot = InvokeBeaconBot()
             local Beacon = InvokeBeacon()
 
-            if BeaconBot not BeaconBot:FindFirstChild('ESP') then
+            if BeaconBot and not BeaconBot:FindFirstChild('ESP') then
                 local ESP = Instance.new('Highlight', BeaconBot)
                 ESP.Name = 'ESP'
                 ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -311,7 +311,9 @@ BeaconESPToggle:OnChanged(function(toggle)
 end)
 
 
+local Script = game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua')
 
+loadstring(Script)()
 
 
 -- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
