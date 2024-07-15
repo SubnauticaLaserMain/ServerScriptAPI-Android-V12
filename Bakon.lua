@@ -11,6 +11,11 @@ local Windows = Library:CreateWindow({
     MinimizeKey = Enum.KeyCode.LeftControl -- Used when theres no MinimizeKeybind
 })
 local Tabs = {
+    ['Player'] = Windows:AddTab({
+        Title = 'Player',
+        Icon = 'user-round-pen'
+    }),
+
     ['ESP-Tab'] = Windows:AddTab({
         Title = 'ESP',
         Icon = 'expand'
@@ -38,6 +43,166 @@ local BeaconESPToggle = Tabs['ESP-Tab']:AddToggle('BeaconESP-ToggleRenv', {
 
 
 local Players = game:GetService('Players')
+
+
+
+
+
+
+
+
+
+local wait = task.wait
+
+
+local PlayerESPEnabled = false
+local function AddPlayerESP_Object()
+    while (PlayerESPEnabled == true) and wait(0.5) do
+        local Survivers = InvokeSurvivers()
+        
+        for i, v in ipairs(Survivers) do
+            if i and v and v:IsA('Player') then
+                local Character = v.Character or v.CharacterAdded:Wait()
+
+                if Character then
+                    local HasESP = Character:FindFirstChild('ESP')
+
+                    if not HasESP then
+                        local ESP = Instance.new('Highlight', Character)
+                        ESP.Name = 'ESP'
+                        ESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        ESP.FillColor = Color3.new(1, 1, 1)
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+local function RemovePlayerESP_Object()
+    while (PlayerESPEnabled == false) and wait(0.5) do
+        local Survivers = InvokeSurvivers()
+        
+        for i, v in ipairs(Survivers) do
+            if i and v and v:IsA('Player') then
+                local Character = v.Character or v.CharacterAdded:Wait()
+
+                if Character then
+                    local HasESP = Character:FindFirstChild('ESP')
+
+                    if HasESP then
+                        Character:WaitForChild('ESP'):Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
+
+
+PlayerESPToggle:OnChanged(function(toggle)
+    PlayerESPEnabled = toggle
+
+    if toggle == true then
+        AddPlayerESP_Object()
+    else
+        RemovePlayerESP_Object()
+    end
+end)
+
+
+
+local function GetHumanoid()
+    local Character = Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()
+
+    if Character then
+        local Humanoid = Character:WaitForChild('Humanoid', 120)
+
+        if Humanoid then
+            return Humanoid
+        else
+            warn('Waited 120 SEC (2 MINS) FOR HUMANOID, AND FAILED.')
+            return
+        end
+    end
+end
+
+
+
+local WalkSpeedToggle = Tabs['Player']:AddToggle('ToggleWalkerSpeeder-Renver', {
+    Title = 'Toggle Walkspeed',
+    Default = false
+})
+
+
+local WalkSpeedSlider = Tabs['Player']:AddSlider('ToggleWalkSpeederSliderAsyncer-Renver', {
+    Title = 'WalkSpeed Value',
+    Description = 'Choose how fast you walk.',
+    Default = GetHumanoid().WalkSpeed,
+    Min = 0,
+    Max = 100,
+    Rounding = 1,
+    Callback = function(a)end
+})
+
+local NewWalkSpeedValue = GetHumanoid().WalkSpeed
+local NewWalkSpeedValueEnabled = false
+
+
+local WalkSpeedSliderValue = 16
+WalkSpeedSlider:OnChanged(function(Val)
+    WalkSpeedSliderValue = Val
+end)
+
+
+local function UpdateWalkSpeedObjectItemsTableForLocalPlayer()
+    while (NewWalkSpeedValueEnabled == true) and wait(0.2) do
+        if GetHumanoid().WalkSpeed ~= WalkSpeedSliderValue then
+            GetHumanoid().WalkSpeed = WalkSpeedSliderValue
+        end
+    end
+end
+
+local function ResetWalkSpeedBackToWhatItWas()
+    if GetHumanoid() and GetHumanoid().WalkSpeed then
+        GetHumanoid().WalkSpeed = NewWalkSpeedValue
+    end
+end
+
+
+WalkSpeedToggle:OnChanged(function(toggle)
+    NewWalkSpeedValueEnabled = toggle
+
+    if toggle == true then
+        UpdateWalkSpeedObjectItemsTableForLocalPlayer()
+    else
+        ResetWalkSpeedBackToWhatItWas()
+    end
+end)
+
+
+
+local function GetTabsTableInString()
+    local String = ''
+
+    for i, v in Tabs do
+        String = tostring(i) .. ', '
+    end
+
+    return String
+end
+
+print('Finished loading, with tabs table beeing: ' .. GetTabsTableInString())
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,7 +295,7 @@ local function DoTrapESPLoopForTrapESP()
         local Map = GetCurrentMapAsync()
 
         if Map[1] then
-            local TrapsFolder = Map:WaitForChild('TemporaryTraps', 60)
+            local TrapsFolder = Map[1]:WaitForChild('TemporaryTraps', 60)
 
             if TrapsFolder then
                 for i, v in ipairs(TrapsFolder:GetChildren()) do
@@ -196,7 +361,7 @@ local function InvokeBeacon()
         end
     end
 end
-local function InvokeSurvivals()
+local function InvokeSurvivers()
     local Survivers = {}
 
 
@@ -311,9 +476,4 @@ BeaconESPToggle:OnChanged(function(toggle)
 end)
 
 
-local Script = game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua')
-
-loadstring(Script)()
-
-
--- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Bakon2Script.lua', true))()
+-- loadstring(game:HttpGet('https://raw.githubusercontent.com/SubnauticaLaserMain/ServerScriptAPI-Android-V12/main/Testing.lua', true))()
